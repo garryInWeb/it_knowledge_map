@@ -1,0 +1,15 @@
+kind: Role   # ClusterRole no-namespace 的角色api
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  # 指定了角色操作的命名空间
+  namespace: mynamespace
+  name: exmaple-Role
+# 允许“被作用者” 对 mynamespace 下面的pod对象，进行 GET、WATCH、LIST操作
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get","watch","list"] # ["get","list","watch","create","update","path","delete"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: ["my-config"]
+    verbs: ["get","watch","list"] # ["get","list","watch","create","update","path","delete"]

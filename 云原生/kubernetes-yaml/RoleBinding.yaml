@@ -1,0 +1,14 @@
+kind: RoleBinding  # ClusterRoleBinding no-namespace 的api
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: example-RoleBinding
+  namespace: mynamespace
+subjects:
+  - kind: User
+    name: exmaple-User
+    apiGroup: rbac.authorization.k8s.io
+    # 制定了 User 与 Role 绑定
+    roleRef:
+      kind: Role
+      name: example-role
+      apiGroup: rbac.authorization.k8s.io
