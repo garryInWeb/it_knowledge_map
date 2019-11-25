@@ -14,35 +14,35 @@ spec:
         app: prometheus-dep
     spec:
       containers:
-      - image: prom/prometheus: v2.3.2
-        name: prometheus-pod
-        command:
-        - "/bin/prometheus"
-        args:
-        - "--config.file=/etc/prometheus/prometheus.yml"
-        - "--storage.tsdb.path=/prometheus"
-        - "--storage.tsdb.retention=1d"
-        ports:
-        - containerPort: 9090
-          protocol: TCP
-        volumeMounts:
-        - mountPath: "/prometheus"
-         name: data
-         - mountPath: "/etc/prometheus"
-          name: config-volume
-        resources:
-          requests:
-            cpu: 100m
-            memory: 100Mi
-          limits:
-            cpu: 500m
-            memory: 250Mi
+        - image: prom/prometheus:v2.3.2
+          name: prometheus-pod
+          command:
+            - "/bin/prometheus"
+          args:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--storage.tsdb.path=/prometheus"
+            - "--storage.tsdb.retention=1d"
+          ports:
+            - containerPort: 9090
+              protocol: TCP
+          volumeMounts:
+            - name: data
+              mountPath: "/prometheus"
+            - name: config-volume
+              mountPath: "/etc/prometheus"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+            limits:
+              cpu: 500m
+              memory: 250Mi
       serviceAccountName: prometheus-sa
       imagePullSecrets:
         - name: regsecret
       volumes:
-      - name: data
-        emptyDir: {}
-      - name: config-volume
-        configMap:
-          name: prometheus-config
+        - name: data
+          emptyDir: {}
+        - name: config-volume
+          configMap:
+            name: prometheus-config
