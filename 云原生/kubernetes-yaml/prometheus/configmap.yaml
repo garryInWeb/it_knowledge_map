@@ -163,3 +163,18 @@ data:
       - source_labels: [__meta_kubernetes_pod_name]
         action: replace
         target_label: kubernetes_pod_name
+    groups:
+    - name: test-rule
+      rules:
+      - alter: k8s-node
+        expr: (sum(rate(container_cpu_usage_seconds_total{pod_name != "" , container_name != ""}[1m])) / sum(machine_cpu_cores) * 100) > 80
+        for: 1m
+        annotations:
+          summary: "节点CPU高占用"
+          description: "占用额 { {$value }}"
+      - alter: k8s-node
+        expr: (sum(rate(container_cpu_usage_seconds_total{pod_name != "" , container_name != ""}[1m])) / sum(machine_cpu_cores) * 100) < 10
+        for: 1m
+        annotations:
+          summary: "节点CPU低占用"
+          description: "占用额 { {$value }}"
