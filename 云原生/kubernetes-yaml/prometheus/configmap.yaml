@@ -11,6 +11,13 @@ data:
       scrape_interval:     15s
       # 报警拉取间隔
       evaluation_interval: 15s
+    rule_files:
+    - /etc/prometheus/rules.yml
+    #将报警送至何地进行报警
+    alerting:
+      alertmanagers:
+        - static_configs:
+          - targets: ["192.168.50.60:9093"]
     # 抓取配置
     scrape_configs:
     # 拉取单元
@@ -163,18 +170,35 @@ data:
       - source_labels: [__meta_kubernetes_pod_name]
         action: replace
         target_label: kubernetes_pod_name
+
+  rules.yml: |
+    # groups:
+    # - name: example
+    #   rules:
+    #   - alert: HighErrorRate
+    #     expr: job:request_latency_seconds:mean5m{job="myjob"} > 0.5
+    #     for: 10m
+    #     labels:
+    #       severity: page
+    #     annotations:
+    #       summary: High request latency
+    #       description: description info
     groups:
     - name: test-rule
       rules:
-      - alter: k8s-node
-        expr: (sum(rate(container_cpu_usage_seconds_total{pod_name != "" , container_name != ""}[1m])) / sum(machine_cpu_cores) * 100) > 80
+      - alert: k8s-node
+        expr: sum(rate(container_cpu_usage_seconds_total{pod_name != "" , container_name != ""}[1m])) / sum(machine_cpu_cores) * 100 > 80
         for: 1m
+        labels:
+          team: k8s-node
         annotations:
           summary: "节点CPU高占用"
-          description: "占用额 { {$value }}"
-      - alter: k8s-node
-        expr: (sum(rate(container_cpu_usage_seconds_total{pod_name != "" , container_name != ""}[1m])) / sum(machine_cpu_cores) * 100) < 10
-        for: 1m
-        annotations:
-          summary: "节点CPU低占用"
-          description: "占用额 { {$value }}"
+          description: "占用额 {{ $value }}"
+      # - alter: k8s-node-d
+      #   expr: (sum(rate(container_cpu_usage_seconds_total{pod_name != "" , container_name != ""}[1m])) / sum(machine_cpu_cores) * 100) < 10
+      #   for: 1m
+      #   labels:
+      #     team: k8s-node
+      #   annotations:
+      #     summary: "节点CPU低占用"
+      #     description: "占用额 {{ $value }}"
